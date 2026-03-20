@@ -53,7 +53,7 @@ function ProcessSteps() {
             <button
               key={i}
               onClick={() => setActive(i)}
-              className="group flex flex-col items-center gap-2"
+              className="group flex flex-col items-center gap-2 cursor-pointer transition-all duration-200"
             >
               <motion.div
                 animate={{
@@ -61,9 +61,9 @@ function ProcessSteps() {
                   backgroundColor: active === i ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)',
                 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="h-2 rounded-full"
+                className="h-2 rounded-full group-hover:bg-white/50"
               />
-              <span className={`text-xs font-medium transition-colors ${active === i ? 'text-white' : 'text-white/40'}`}>
+              <span className={`text-xs font-medium transition-colors duration-200 ${active === i ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`}>
                 {steps[i].num}
               </span>
             </button>
@@ -143,11 +143,29 @@ export default function App() {
     return () => window.removeEventListener('open-bar-modal', handler);
   }, []);
 
-  const handleJoinWaitlist = (e: React.FormEvent) => {
+  const [waitlistError, setWaitlistError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleJoinWaitlist = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+    setIsSubmitting(true);
+    setWaitlistError('');
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${apiUrl}/api/waitlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to join');
       setJoined(true);
       setEmail('');
+    } catch (err) {
+      setWaitlistError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -161,14 +179,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-bg text-text-primary font-sans selection:bg-accent selection:text-white">
+    <div className="min-h-screen bg-bg text-text-primary font-sans selection:bg-white selection:text-black">
       <Header onVenueOwnerClick={() => setShowOwnerModal(true)} />
 
       {/* Hero */}
       <section className="relative w-full min-h-screen flex flex-col items-center justify-center bg-black overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="/blur.png" 
+            src="https://v1lgjc6lddlnqffz.public.blob.vercel-storage.com/blur.png" 
             alt="" 
             className="w-full h-full object-cover grayscale opacity-50 scale-105"
           />
@@ -211,14 +229,19 @@ export default function App() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email" 
                   required
-                  className="flex-1 bg-white/[0.02] backdrop-blur-sm border border-white/20 px-5 py-3.5 rounded-full text-white placeholder:text-white/60 text-base outline-none focus:border-white/35 transition-colors"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-white/[0.02] backdrop-blur-sm border border-white/20 px-5 py-3.5 rounded-full text-white placeholder:text-white/60 text-base outline-none focus:border-white/35 transition-colors disabled:opacity-60"
                 />
                 <button 
                   type="submit"
-                  className="bg-white text-black font-medium px-6 py-3.5 rounded-full hover:bg-white/95 transition-colors flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="bg-white text-black font-medium px-6 py-3.5 rounded-full cursor-pointer transition-all duration-200 hover:bg-white/95 hover:scale-[1.02] hover:shadow-lg hover:shadow-white/10 active:scale-[0.98] disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Join waitlist <ArrowRight className="w-4 h-4" />
+                  {isSubmitting ? 'Joining...' : 'Join waitlist'} <ArrowRight className="w-4 h-4" />
                 </button>
+                {waitlistError && (
+                  <p className="text-red-400 text-sm col-span-full">{waitlistError}</p>
+                )}
               </form>
             )}
           </div>
@@ -254,7 +277,7 @@ export default function App() {
                 <h3 className="text-2xl font-medium tracking-tight">Partner with Backdoor</h3>
                 <button 
                   onClick={() => setShowOwnerModal(false)}
-                  className="w-10 h-10 rounded-full bg-surface-sec flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors"
+                  className="w-10 h-10 rounded-full bg-surface-sec flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-white/10 cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -277,23 +300,23 @@ export default function App() {
                     <form onSubmit={handleOwnerSubmit} className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-text-secondary mb-1.5">Bar Name</label>
-                        <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="e.g. Kollege Klub" />
+                        <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Bar Name" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-text-secondary mb-1.5">First Name</label>
-                          <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Jane" />
+                          <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="First Name" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-text-secondary mb-1.5">Last Name</label>
-                          <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Doe" />
+                          <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Last Name" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-text-secondary mb-1.5">Work Email</label>
-                        <input required type="email" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="jane@kollegeklub.com" />
+                        <input required type="email" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Work Email" />
                       </div>
-                      <button type="submit" className="w-full bg-white hover:bg-gray-200 text-black font-medium text-lg px-6 py-4 rounded-xl shadow-lg transition-all mt-4">
+                      <button type="submit" className="w-full bg-white text-black font-medium text-lg px-6 py-4 rounded-xl shadow-lg cursor-pointer transition-all duration-200 hover:bg-gray-200 hover:scale-[1.01] active:scale-[0.99] mt-4">
                         Request Demo
                       </button>
                     </form>

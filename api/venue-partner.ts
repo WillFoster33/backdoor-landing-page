@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { Resend } from 'resend';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 function getSql() {
@@ -9,6 +10,16 @@ function getSql() {
     process.env.storage_DATABASE_URL ||
     process.env.POSTGRES_PRISMA_URL;
   return conn ? neon(conn) : null;
+}
+
+const ADMIN_EMAIL = 'admin@backdoorpass.app';
+
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -49,6 +60,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       INSERT INTO venue_partners (bar_name, first_name, last_name, work_email)
       VALUES (${barName.trim()}, ${firstName.trim()}, ${lastName.trim()}, ${workEmail.trim().toLowerCase()})
     `;
+
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey) {
+      const resend = new Resend(resendKey);
+      const from = process.env.RESEND_FROM || 'Backdoor <onboarding@resend.dev>';
+      await resend.emails.send({
+        from,
+        to: [ADMIN_EMAIL],
+        subject: `Demo request: ${barName.trim()}`,
+        html: `
+          <p><strong>New venue partner demo request</strong></p>
+          <table>
+            <tr><td>Bar name</td><td>${escapeHtml(barName.trim())}</td></tr>
+            <tr><td>Name</td><td>${escapeHtml(firstName.trim())} ${escapeHtml(lastName.trim())}</td></tr>
+            <tr><td>Email</td><td>${escapeHtml(workEmail.trim())}</td></tr>
+          </table>
+        `,
+      });
+    }
+
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error(err);

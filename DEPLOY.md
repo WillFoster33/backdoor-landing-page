@@ -9,6 +9,8 @@
 
 The API routes (`/api/waitlist`, `/api/venue-partner`) create tables automatically on first use. They read `POSTGRES_URL`, `storage_POSTGRES_URL`, `DATABASE_URL`, `storage_DATABASE_URL`, or `POSTGRES_PRISMA_URL`. Vercel Storage adds the `storage_` prefix when you connect Neon.
 
+**Venue demo emails:** Add `RESEND_API_KEY` from [resend.com](https://resend.com). Demo requests are saved to the DB and emailed to admin@backdoorpass.app. On Resend’s free tier, either sign up with that address or verify backdoorpass.app; then set `RESEND_FROM` to `Backdoor <noreply@backdoorpass.app>`.
+
 **If you get "Database not configured":** Make sure the env var is enabled for **Production**, then go to Deployments → Redeploy (the latest deployment) so the new config is picked up.
 
 **View waitlist emails:**

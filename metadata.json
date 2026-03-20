@@ -1,0 +1,5 @@
+{
+  "name": "Backdoor Landing Page",
+  "description": "Landing page for Backdoor, a bar reservation app that lets groups skip the line.",
+  "requestFramePermissions": []
+}

@@ -24,27 +24,13 @@ function ProcessSteps() {
 
   return (
     <section className="relative py-32 px-6 overflow-hidden bg-[#0a0a0a]">
-      {/* Animated gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            x: [0, 100, -50, 0],
-            y: [0, -30, 50, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-white/[0.08] blur-3xl"
-        />
-        <motion.div
-          animate={{
-            x: [0, -80, 60, 0],
-            y: [0, 40, -20, 0],
-            scale: [1, 1.3, 1],
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-white/[0.05] blur-3xl"
-        />
-      </div>
+      {/* Soft ambient light - single, static, diffuse */}
+      <div 
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 100% 80% at 50% 40%, rgba(255,255,255,0.07) 0%, transparent 60%)',
+        }}
+      />
 
       <div className="relative max-w-5xl mx-auto">
         {/* Progress dots */}

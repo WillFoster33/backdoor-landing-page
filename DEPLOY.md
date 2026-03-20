@@ -7,7 +7,9 @@
 3. Connect it to your project. Vercel will add `POSTGRES_URL` (or `DATABASE_URL`) as an env var.
 4. Redeploy so the API routes can use the database.
 
-The API routes (`/api/waitlist`, `/api/venue-partner`) create tables automatically on first use.
+The API routes (`/api/waitlist`, `/api/venue-partner`) create tables automatically on first use. They read `POSTGRES_URL`, `storage_POSTGRES_URL`, `DATABASE_URL`, `storage_DATABASE_URL`, or `POSTGRES_PRISMA_URL`. Vercel Storage adds the `storage_` prefix when you connect Neon.
+
+**If you get "Database not configured":** Make sure the env var is enabled for **Production**, then go to Deployments → Redeploy (the latest deployment) so the new config is picked up.
 
 ## 2. Deploy
 

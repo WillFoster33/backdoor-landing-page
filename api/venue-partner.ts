@@ -1,8 +1,15 @@
 import { neon } from '@neondatabase/serverless';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const conn = process.env.POSTGRES_URL || process.env.DATABASE_URL;
-const sql = conn ? neon(conn) : null;
+function getSql() {
+  const conn =
+    process.env.POSTGRES_URL ||
+    process.env.storage_POSTGRES_URL ||
+    process.env.DATABASE_URL ||
+    process.env.storage_DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL;
+  return conn ? neon(conn) : null;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,6 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  const sql = getSql();
   if (!sql) return res.status(500).json({ error: 'Database not configured' });
 
   try {

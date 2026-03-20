@@ -23,7 +23,7 @@ function ProcessSteps() {
   }, []);
 
   return (
-    <section className="relative py-32 px-6 overflow-hidden bg-[#0a0a0a] border-t border-white/5">
+    <section className="relative py-32 px-6 overflow-hidden bg-[#0a0a0a]">
       {/* Animated gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -136,6 +136,14 @@ export default function App() {
   const [joined, setJoined] = useState(false);
   const [showOwnerModal, setShowOwnerModal] = useState(false);
   const [ownerSubmitted, setOwnerSubmitted] = useState(false);
+  const [ownerForm, setOwnerForm] = useState({
+    barName: '',
+    firstName: '',
+    lastName: '',
+    workEmail: '',
+  });
+  const [ownerError, setOwnerError] = useState('');
+  const [ownerSubmitting, setOwnerSubmitting] = useState(false);
 
   useEffect(() => {
     const handler = () => setShowOwnerModal(true);
@@ -152,7 +160,7 @@ export default function App() {
     setIsSubmitting(true);
     setWaitlistError('');
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const res = await fetch(`${apiUrl}/api/waitlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -169,13 +177,35 @@ export default function App() {
     }
   };
 
-  const handleOwnerSubmit = (e: React.FormEvent) => {
+  const handleOwnerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setOwnerSubmitted(true);
-    setTimeout(() => {
-      setShowOwnerModal(false);
-      setOwnerSubmitted(false);
-    }, 3000);
+    setOwnerError('');
+    setOwnerSubmitting(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${apiUrl}/api/venue-partner`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          barName: ownerForm.barName,
+          firstName: ownerForm.firstName,
+          lastName: ownerForm.lastName,
+          workEmail: ownerForm.workEmail,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit');
+      setOwnerSubmitted(true);
+      setOwnerForm({ barName: '', firstName: '', lastName: '', workEmail: '' });
+      setTimeout(() => {
+        setShowOwnerModal(false);
+        setOwnerSubmitted(false);
+      }, 3000);
+    } catch (err) {
+      setOwnerError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
+    } finally {
+      setOwnerSubmitting(false);
+    }
   };
 
   return (
@@ -191,7 +221,7 @@ export default function App() {
             className="w-full h-full object-cover grayscale opacity-50 scale-105"
           />
           <div className="absolute inset-0 bg-black/50" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-[#0a0a0a]" />
         </div>
         
         <div className="max-w-3xl mx-auto flex flex-col items-center text-center relative z-10 w-full px-6 pt-24 pb-20">
@@ -276,7 +306,7 @@ export default function App() {
               <div className="flex justify-between items-center p-6 border-b border-surface-sec">
                 <h3 className="text-2xl font-medium tracking-tight">Partner with Backdoor</h3>
                 <button 
-                  onClick={() => setShowOwnerModal(false)}
+                  onClick={() => { setShowOwnerModal(false); setOwnerForm({ barName: '', firstName: '', lastName: '', workEmail: '' }); setOwnerError(''); }}
                   className="w-10 h-10 rounded-full bg-surface-sec flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-white/10 cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
                 >
                   <X className="w-5 h-5" />
@@ -300,24 +330,25 @@ export default function App() {
                     <form onSubmit={handleOwnerSubmit} className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-text-secondary mb-1.5">Bar Name</label>
-                        <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Bar Name" />
+                        <input required type="text" value={ownerForm.barName} onChange={(e) => setOwnerForm((f) => ({ ...f, barName: e.target.value }))} className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Bar Name" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-text-secondary mb-1.5">First Name</label>
-                          <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="First Name" />
+                          <input required type="text" value={ownerForm.firstName} onChange={(e) => setOwnerForm((f) => ({ ...f, firstName: e.target.value }))} className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="First Name" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-text-secondary mb-1.5">Last Name</label>
-                          <input required type="text" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Last Name" />
+                          <input required type="text" value={ownerForm.lastName} onChange={(e) => setOwnerForm((f) => ({ ...f, lastName: e.target.value }))} className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Last Name" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-text-secondary mb-1.5">Work Email</label>
-                        <input required type="email" className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Work Email" />
+                        <input required type="email" value={ownerForm.workEmail} onChange={(e) => setOwnerForm((f) => ({ ...f, workEmail: e.target.value }))} className="w-full bg-bg border border-surface-sec rounded-xl px-4 py-3 text-text-primary focus:border-white/50 focus:ring-1 focus:ring-white/50 outline-none transition-all font-light" placeholder="Work Email" />
                       </div>
-                      <button type="submit" className="w-full bg-white text-black font-medium text-lg px-6 py-4 rounded-xl shadow-lg cursor-pointer transition-all duration-200 hover:bg-gray-200 hover:scale-[1.01] active:scale-[0.99] mt-4">
-                        Request Demo
+                      {ownerError && <p className="text-red-400 text-sm">{ownerError}</p>}
+                      <button type="submit" disabled={ownerSubmitting} className="w-full bg-white text-black font-medium text-lg px-6 py-4 rounded-xl shadow-lg cursor-pointer transition-all duration-200 hover:bg-gray-200 hover:scale-[1.01] active:scale-[0.99] mt-4 disabled:opacity-60 disabled:cursor-not-allowed">
+                        {ownerSubmitting ? 'Submitting...' : 'Request Demo'}
                       </button>
                     </form>
                   </>

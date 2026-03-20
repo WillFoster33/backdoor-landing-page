@@ -1,6 +1,15 @@
 # Deploy to Vercel
 
-## 1. Deploy
+## 1. Add database (for waitlist & venue partner forms)
+
+1. In your Vercel project → **Storage** tab (or **Integrations**).
+2. Create a **Postgres** database (Vercel Postgres or Neon).
+3. Connect it to your project. Vercel will add `POSTGRES_URL` (or `DATABASE_URL`) as an env var.
+4. Redeploy so the API routes can use the database.
+
+The API routes (`/api/waitlist`, `/api/venue-partner`) create tables automatically on first use.
+
+## 2. Deploy
 
 1. Go to [vercel.com](https://vercel.com) and sign in (use GitHub).
 2. Click **Add New** → **Project**.
@@ -9,7 +18,7 @@
 
 Your site will be live at `backdoor-landing-page.vercel.app` (or a similar URL).
 
-## 2. Custom domain (backdoorpass.app)
+## 3. Custom domain (backdoorpass.app)
 
 1. In your Vercel project → **Settings** → **Domains**.
 2. Add `backdoorpass.app`.
@@ -29,12 +38,7 @@ Or use Vercel’s nameservers for automatic DNS.
 
 5. Wait for DNS to propagate (a few minutes). Vercel will issue SSL automatically.
 
-## 3. Waitlist API (optional)
+## 4. Local development (optional)
 
-If you use the waitlist API, add an env var in Vercel:
-
-1. **Settings** → **Environment Variables**
-2. Add `VITE_API_URL` = your API URL (e.g. Railway/Render URL)
-3. Redeploy so the new value is picked up
-
-If you don’t have an API yet, the form will fail in production until you deploy the server or switch to a form service like Formspree.
+- **Full stack (forms work):** Run `npx vercel dev` so API routes and DB are available locally.
+- **Frontend only:** Run `npm run dev`. Forms will fail until you deploy or run `vercel dev`.

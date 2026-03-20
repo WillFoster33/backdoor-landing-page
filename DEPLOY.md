@@ -11,6 +11,13 @@ The API routes (`/api/waitlist`, `/api/venue-partner`) create tables automatical
 
 **If you get "Database not configured":** Make sure the env var is enabled for **Production**, then go to Deployments → Redeploy (the latest deployment) so the new config is picked up.
 
+**View waitlist emails:**
+1. Go to [Neon Console](https://console.neon.tech) → your project.
+2. Open the **SQL Editor**.
+3. Run: `SELECT * FROM waitlist ORDER BY created_at DESC;`
+
+Venue partner submissions: `SELECT * FROM venue_partners ORDER BY created_at DESC;`
+
 ## 2. Deploy
 
 1. Go to [vercel.com](https://vercel.com) and sign in (use GitHub).

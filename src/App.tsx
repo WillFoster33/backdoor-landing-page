@@ -33,7 +33,7 @@ function ProcessSteps() {
             scale: [1, 1.2, 1],
           }}
           transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-white/[0.02] blur-3xl"
+          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-white/[0.08] blur-3xl"
         />
         <motion.div
           animate={{
@@ -42,7 +42,7 @@ function ProcessSteps() {
             scale: [1, 1.3, 1],
           }}
           transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-white/[0.015] blur-3xl"
+          className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-white/[0.05] blur-3xl"
         />
       </div>
 

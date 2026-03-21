@@ -64,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const resendKey = process.env.RESEND_API_KEY;
     if (resendKey) {
       const resend = new Resend(resendKey);
-      const from = process.env.RESEND_FROM || 'Backdoor <notifications@send.backdoorpass.app>';
+      const from = process.env.RESEND_FROM || 'Backdoor <notifications@backdoorpass.app>';
       const { error } = await resend.emails.send({
         from,
         to: [ADMIN_EMAIL],

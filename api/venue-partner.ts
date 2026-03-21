@@ -64,10 +64,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const resendKey = process.env.RESEND_API_KEY;
     if (resendKey) {
       const resend = new Resend(resendKey);
-      const from = process.env.RESEND_FROM || 'Backdoor <onboarding@resend.dev>';
+      const from = process.env.RESEND_FROM || 'Backdoor <notifications@mail.backdoorpass.app>';
       await resend.emails.send({
         from,
         to: [ADMIN_EMAIL],
+        replyTo: workEmail.trim(),
         subject: `Demo request: ${barName.trim()}`,
         html: `
           <p><strong>New venue partner demo request</strong></p>

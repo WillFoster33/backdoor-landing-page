@@ -24,14 +24,6 @@ function ProcessSteps() {
 
   return (
     <section className="relative py-32 px-6 overflow-hidden bg-[#0a0a0a]">
-      {/* Soft ambient light - single, static, diffuse */}
-      <div 
-        className="absolute inset-0 overflow-hidden pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse 50% 40% at 50% 45%, rgba(255,255,255,0.05) 0%, transparent 55%)',
-        }}
-      />
-
       <div className="relative max-w-5xl mx-auto">
         {/* Progress dots */}
         <div className="flex justify-center gap-3 mb-16">
